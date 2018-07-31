@@ -19,15 +19,21 @@ if __name__ == "__main__":
 	#Using the adjacency matrix above, we construct a transition matrix
 	#And also create a distribution for a random surfer
 	
-	trans_matrix = np.array([row / sum(row == 1) for row in web_graph.T]).T
+	trans_matrix = np.array([row / sum(row == 1) if sum(row == 1) != 0 else row for row in web_graph.T]).T
 	vector = np.array([1] * len(trans_matrix)) / len(trans_matrix)
 	
 	#Iterative update of the distribution vector is done by multiplyting with the transition matrix
 	#Ended when error between the new and old vector is less than a threshold, as in error(old,new)
 
 	flag = True	
+	beta = 0.8
+
 	while flag:
-		new_vector = trans_matrix @ vector
+		
+		#Adds a fraction of probability that a random surfer can "teleport" into a random page
+		#Eventhough the spider trap gets a large amount of Pagerank, the effect has been limited.
+
+		new_vector = beta * (trans_matrix @ vector) + ((1 - beta) / len(trans_matrix)) * np.ones(len(trans_matrix))
 		
 		if error(vector, new_vector):
 			flag = False
