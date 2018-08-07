@@ -30,26 +30,38 @@ where 'p' is a prime next to the maximum value in the universe of valid keys.
 
 '''
 
-def hash(a, b, p, m, key):
-	return ((a * key + b) % p) % m
+def hash(a, b, p, m, keys):
+	return dict(zip(keys, (((a * np.array(keys) + b) % p) % m)))
 
+def get_list(shingles):
+	item_list = []
+
+	for key, values in shingles.items():
+		item_list += values
+	
+	return sorted(list(set(item_list)))
+
+def signature(shingles, m, sign_length):
+
+	p = get_prime(m)
+	hash_parameters = [[np.random.randint(1, p-1), np.random.randint(0, p-1)] for i in range(sign_length)]
+	signatures = {key : [[np.inf] for count in range(len(hash_parameters))] for key in shingles}
+	list_of_items = get_list(shingles)	
+	
+	for index, [a, b] in enumerate(hash_parameters):
+		for row, hash_value in hash(a, b, p, m, list_of_items).items():
+			for key, k_shingles in shingles.items():
+				if (row in k_shingles) and (hash_value < signatures[key][index]):
+					signatures[key][index] = hash_value
+
+	return signatures
+
+'''
 if __name__ == "__main__":
+	shingles = {"s1" : [0, 3],
+				"s2" : [2],
+				"s3" : [1, 3, 4],
+				"s4" : [0, 2, 3]}
 
-	with open("char_mat.txt", "r") as handle:
-		matrix = np.array([line.split() for line in handle], dtype = int)
-
-	num_hash_fun = 2
-	p = get_prime(matrix.shape[0])
-	hash_parameters = [[np.random.randint(1, p-1), np.random.randint(0, p-1)] for i in range(num_hash_fun)]
-	signature_matrix = np.array([[np.inf] * matrix.shape[1] for i in range(num_hash_fun)])
-
-	for i, row in enumerate(matrix):
-		hash_values = [hash(a, b, p, matrix.shape[0], i) for a, b in hash_parameters]
-
-		#FIXME : Collision in hash value since small p and m`	
-		for j, col in enumerate(row):
-			for k in range(num_hash_fun):
-				if (col == 1) and (signature_matrix[k, j] > hash_values[k]):
-					signature_matrix[k, j] = hash_values[k]
-
-	print(signature_matrix)	
+	print(signature(shingles, 5, 2))
+'''
