@@ -1,34 +1,19 @@
 import math
 import pdb
 import numpy as np
-
-def get_prime(number):	
-	
-	flag = True
-	num = number + 1
-
-	while flag and num < 100:
-
-		i = 2
-		while (i <= math.sqrt(num)) and (num % i != 0):
-			i += 1
-
-		if i > math.sqrt(num):
-			flag = False
-		else:
-			num += 1
-
-	return num
+from prime import get_prime
 
 def hash(a, b, p, m, key):
 	return ((((a * key + b) % p) % m))
 
 def get_candidate_pairs(candidate_pairs):
-	#pdb.set_trace()
+	
 	pairs = 0
 	while pairs < len(candidate_pairs):
+
 		row = pairs + 1
 		while row < len(candidate_pairs):
+
 			if candidate_pairs[pairs].intersection(candidate_pairs[row]):
 				candidate_pairs[pairs] = candidate_pairs[pairs].union(candidate_pairs[row])
 				del candidate_pairs[row]
@@ -39,18 +24,18 @@ def get_candidate_pairs(candidate_pairs):
 
 	return candidate_pairs
 
-def locality_sensitive_hashing(signatures, b,  r):
-	
+def locality_sensitive_hashing(signatures, no_bands, no_rows):
+
 	#fixing bucket length equal to the signature length	
-	p = get_prime(b * r)
+	p = get_prime(no_bands * no_rows)
 	a, b= (np.random.randint(1, p-1), np.random.randint(0, p-1))
 
 	candidate_pairs = []
-	for band in range(b):
+	for band in range(no_bands):
 
 		dictionary = {}
 		for key, values in signatures.items():
-			hash_value = hash(a, b, p, b * r, sum(values[(band * r) : (band * r) + r]))
+			hash_value = hash(a, b, p, no_bands * no_rows, sum(values[(band * no_rows) : (band * no_rows) + no_rows]))
 			try:
 				dictionary[hash_value].append(key)
 			except KeyError:
