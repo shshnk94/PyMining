@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import knn
+from sklearn.neighbors import KNeighborsClassifier
 
 def split(df):
 
@@ -12,7 +13,7 @@ def split(df):
 	return (train, test)
 
 def error(test, prediction):
-	return (np.sum(np.equal(test, prediction)) / test.shape[0])
+	return (np.sum(np.not_equal(test, prediction)) / test.shape[0])
 	
 	
 if __name__ == "__main__":
@@ -23,5 +24,13 @@ if __name__ == "__main__":
 	
 	model = knn.knn(3)
 	prediction = model.predict(train, test)
+	
+	print("Error in custom algorithm" + " " + str(error(test[:,-1], prediction)))
 
-	print(error(test[:,-1], prediction))
+	#validation of the above code using KNeighborsClassifier in sklearn
+	
+	model = KNeighborsClassifier(n_neighbors = 3,  algorithm = "brute", weights = "uniform")
+	model.fit(train[:, :-1], train[:, -1])
+	prediction = model.predict(test[:, :-1])
+	
+	print("Error in KNN from sklearn" + " " + str(error(test[:,-1], prediction)))
