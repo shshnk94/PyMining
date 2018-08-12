@@ -1,5 +1,4 @@
 import numpy as np
-import pdb
 
 #Calculates the mean error between new and old distribution of the random surfer
 
@@ -26,7 +25,7 @@ if __name__ == "__main__":
 	#Ended when error between the new and old vector is less than a threshold, as in error(old,new)
 
 	flag = True	
-	beta = 0.8
+	beta = 0.85
 
 	while flag:
 		

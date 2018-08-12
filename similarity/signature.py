@@ -1,24 +1,7 @@
 import numpy as np
 import math
 import pdb
-
-def get_prime(number):	
-	
-	flag = True
-	num = number + 1
-
-	while flag and num < 100:
-
-		i = 2
-		while (i <= math.sqrt(num)) and (num % i != 0):
-			i += 1
-
-		if i > math.sqrt(num):
-			flag = False
-		else:
-			num += 1
-
-	return num
+from prime import get_prime
 
 '''
 For any 'a' in the range of 1 to p-1 inclusive and 'b' in the range of 0 to p-1 inclusive we define 
