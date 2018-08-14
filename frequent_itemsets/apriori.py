@@ -12,7 +12,7 @@ def items_and_basket():
 	all_items - list of all items
 	"""
 
-	with open("market_basket", "r") as handle:
+	with open("opp_integers", "r") as handle:
 		
 		market_basket = []
 		all_items = []
@@ -140,7 +140,7 @@ def generate_frequent_itemset(market_basket, all_items, minsup):
 if __name__ == "__main__":
 	
 	market_basket, all_items = items_and_basket()
-	frequent_itemsets = generate_frequent_itemset(market_basket, all_items, 0.6)
-
+	frequent_itemsets = generate_frequent_itemset(market_basket, all_items, (5/100))
+	
 	for itemset in frequent_itemsets:
 		print(itemset)
