@@ -1,5 +1,9 @@
 import numpy as np
-import pdb
+
+"""
+class Node defines the node for each bfs_tree node. Node.data stores the node information and, Node.children and 
+Node.parents contain references (pointers) to the children and the parents respectively.
+"""
 
 class Node:
 	
@@ -11,6 +15,11 @@ class Node:
 
 def breadth_first_search(graph, source):
 	
+	"""
+	Constructs the Breadth First Search Tree for a graph but with a minor tweak. A node, even if already discovered, is added 
+	if it belongs to the next level of the node under observation. This helps in couting all the available shortest path to it.
+	"""
+
 	discovered = np.zeros(graph.shape[0])
 
 	bfs_tree = Node(source)
@@ -41,18 +50,11 @@ def breadth_first_search(graph, source):
 
 	return bfs_tree
 
-def traverse(root):
-
-	print(root.data)	
-	if len(root.children) == 0:
-		return 
-
-	for child in root.children:
-		traverse(child)
-
-	return
-
 def count_shortest_path(root, path_counts):
+
+	"""
+	Counts all the available shortest paths to a node from the source/root node.
+	"""
 	
 	if root.children:
 
@@ -70,6 +72,12 @@ def count_shortest_path(root, path_counts):
 	return path_counts	
 
 def credit_calculation(root, path_counts, credit_matrix):
+	
+	"""
+	Calculates credits or betweenness measure for each edge of a bfs_tree recursively. Credit of each node is the
+	sum of the credits of the edges from the node to the nodes in the next level. Thus calculated credit is divided 
+	"proportionately" among the edges to the node from it's parents.
+	"""
 
 	if not root.children:
 		for parent in root.parents:
@@ -97,9 +105,15 @@ if __name__ == "__main__":
 			graph.append(line.split())
 
 	graph = np.array(graph, dtype = int)
-	
-	betweenness_matrix = np.zeros(graph.shape)
 
+	"""	
+	Define a betweenness matrix, which is basically an adjacent matrix of graph with it's node weights	
+	representing the betweenness measure of the edges
+	"""
+
+	betweenness_matrix = np.zeros(graph.shape)
+	
+	#Iterate across each node and calculate the betweenness
 	for node in range(graph.shape[0]):	
 		bfs_tree = breadth_first_search(graph, node)
 		
@@ -111,5 +125,7 @@ if __name__ == "__main__":
 
 		betweenness_matrix += credit_matrix
 	
+	#Betweenness of an edge is calculated twice considering each of it's end points. Hence, divide by 2.	
 	betweenness_matrix = betweenness_matrix / 2
+
 	print(betweenness_matrix)
