@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 
 """
 class Node defines the node for each bfs_tree node. Node.data stores the node information and, Node.children and 
@@ -13,14 +14,12 @@ class Node:
 		self.children = []
 		self.parents = []
 
-def breadth_first_search(graph, source):
+def breadth_first_search(graph, source, discovered):
 	
 	"""
 	Constructs the Breadth First Search Tree for a graph but with a minor tweak. A node, even if already discovered, is added 
 	if it belongs to the next level of the node under observation. This helps in couting all the available shortest path to it.
 	"""
-
-	discovered = np.zeros(graph.shape[0])
 
 	bfs_tree = Node(source)
 	discovered[source] = 1
@@ -80,6 +79,8 @@ def credit_calculation(root, path_counts, credit_matrix):
 	"""
 
 	if not root.children:
+
+		#For all nodes (other than leaf), node credit is calculated by adding the credits of the edges to next level.
 		for parent in root.parents:
 			credit_matrix[parent.data, root.data] += path_counts[parent.data] / path_counts[root.data]
 			credit_matrix[root.data, parent.data] = credit_matrix[parent.data, root.data]
@@ -89,7 +90,8 @@ def credit_calculation(root, path_counts, credit_matrix):
 		for child in root.children:
 			credit_matrix = credit_calculation(child, path_counts, credit_matrix)
 			credit += credit_matrix[root.data, child.data]
-
+		
+		#For all nodes (other than root), divided credit proportionately as mentioned above.
 		if root.parents:
 			for parent in root.parents:
 				credit_matrix[parent.data, root.data] += (path_counts[parent.data] / path_counts[root.data]) * credit
@@ -97,6 +99,35 @@ def credit_calculation(root, path_counts, credit_matrix):
 
 	return credit_matrix			
 
+def clustering(graph, betweenness_matrix, num_clusters):
+	
+	"""
+	Clustering the graph nodes into required number of clusters by deleting edges with max betweenness iteratively
+	"""
+	
+	flag = True
+	
+	while flag:
+		
+		i, j = np.unravel_index(np.argmax(betweenness_matrix), betweenness_matrix.shape)
+
+		#deleting edge with max betweenness
+		graph[i, j] = graph[j, i] = 0
+		betweenness_matrix[i, j] = betweenness_matrix[j, i] = 0
+
+		#End the clustering process when number of connected components are equal to num_clusters
+		component_count = 0
+		discovered = np.zeros(graph.shape[0])
+
+		while 0 in discovered:
+			breadth_first_search(graph, np.where(discovered == 0)[0][0], discovered)
+			component_count += 1
+			
+		if component_count == num_clusters:
+			flag = False
+
+	return graph
+	
 if __name__ == "__main__":
 	
 	graph = []
@@ -115,7 +146,7 @@ if __name__ == "__main__":
 	
 	#Iterate across each node and calculate the betweenness
 	for node in range(graph.shape[0]):	
-		bfs_tree = breadth_first_search(graph, node)
+		bfs_tree = breadth_first_search(graph, node, np.zeros(graph.shape[0]))
 		
 		path_counts = np.zeros(graph.shape[0])
 		path_counts = count_shortest_path(bfs_tree, path_counts)
@@ -128,4 +159,10 @@ if __name__ == "__main__":
 	#Betweenness of an edge is calculated twice considering each of it's end points. Hence, divide by 2.	
 	betweenness_matrix = betweenness_matrix / 2
 
-	print(betweenness_matrix)
+	#print(betweenness_matrix)
+	print("Enter the number of clusters required")
+	num_clusters = int(sys.stdin.readline())
+
+	cluster = clustering(graph, betweenness_matrix, num_clusters)
+	print(cluster)
+	
