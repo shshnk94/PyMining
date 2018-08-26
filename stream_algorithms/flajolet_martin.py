@@ -1,10 +1,8 @@
 import numpy as np
 import sys
-sys.path.append("../")
-from similarity.prime import get_prime
 	
-def hash(a, b, p, m, key):
-	return ((((a * key + b) % p) % m))
+def hash(a, b, m, key):
+	return ((a * key + b) % m)
 
 def trailing_zeroes(hash_value):
 
@@ -33,13 +31,9 @@ if __name__ == "__main__":
 	#Count the actual distinct elements in the stream for further verification
 	actual_uniques = len(np.unique(stream))
 	
-	#Here I'm abusing my knowledge about the length of the stream, which is unknown in practical applications 
-	#Hence, the size of the hash table is kept sufficiently large based on the context.
-	p = get_prime(actual_uniques + 1)
-
 	print("Number of hash functions")
 	num_hash_functions = int(sys.stdin.readline())
-	hash_parameters = [[np.random.randint(1, p-1), np.random.randint(0, p-1)] for i in range(num_hash_functions)]
+	hash_parameters = [[np.random.randint(1, actual_uniques), np.random.randint(1, actual_uniques)] for i in range(num_hash_functions)]
 
 	#Flajolet-Martin Algorithm
 	estimate_uniques = []
@@ -48,7 +42,10 @@ if __name__ == "__main__":
 		max_trailing_zeroes = 0
 		
 		for element in stream:
-			num_trailing_zeroes = trailing_zeroes(hash(a, b, p, stream_size + 1, element))
+
+			#Here I'm abusing my knowledge about the length of the stream, which is unknown in practical applications 
+			#Hence, the size of the hash table is kept sufficiently large based on the context.
+			num_trailing_zeroes = trailing_zeroes(hash(a, b, actual_uniques + 1, element))
 
 			if num_trailing_zeroes > max_trailing_zeroes:
 				max_trailing_zeroes = num_trailing_zeroes
