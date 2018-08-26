@@ -22,7 +22,7 @@ def motvani(bit, bucket_list, timestamp):
 
 	#Create the first bucket in the stream with size 1
 	if not bucket_list:
-		if bit == '1':
+		if bit == 1:
 			bucket_list.append([timestamp, 1])
 	
 	else:
@@ -31,7 +31,7 @@ def motvani(bit, bucket_list, timestamp):
 		if timestamp == bucket_list[0][0]:
 			bucket_list.pop(0)
 
-		if bit == '1':
+		if bit == 1:
 			bucket_list.append([timestamp, 1])
 			merge_buckets(bucket_list)
 	
@@ -42,7 +42,7 @@ def estimate(bucket_list, k, timestamp):
 	ones = 0
 	index = len(bucket_list) - 1
 	
-	while (index != 0) and (k >= (timestamp - bucket_list[index][0])):
+	while (index >= 0) and (k >= (timestamp - bucket_list[index][0])):
 		ones += bucket_list[index][1]
 		index -= 1
 
@@ -54,29 +54,27 @@ if __name__ == "__main__":
 	window_size = int(sys.stdin.readline())
 
 	print("Binary stream size")
-	#FIXME
-	#stream_size = int(sys.stdin.readline())
+	stream_size = int(sys.stdin.readline())
 	
-	#FIXME
-	#stream = []
-	stream = list("1001010110001011010101010101011010101010101110101010111010100010110010")
+	stream = []
+	#stream = list("1001010110001011010101010101011010101010101110101010111010100010110010")
+	#stream = list("11010100010110010111")
 
 	timestamp = 0
 	bucket_list = []
 
-	#FIXME
-	while timestamp < len(stream):
-		#FIXME
-		#bit = np.random.randint(2)
-		bit = stream[timestamp]
+	while timestamp < stream_size:
+		bit = np.random.randint(2)
 
 		#We append the new bit into a list which is used to calculate actual count of 1's.
-		#FIXME
-		#stream.append(bit)
+		stream.append(bit)
 		motvani(bit, bucket_list, timestamp % window_size)
 
 		timestamp += 1
 	
-	print("Actual number of ones", np.sum(np.array(stream) == '1'))	
-	print(estimate(bucket_list, window_size, timestamp))
+	print("Number of most recent bits to be checked")
+	k = int(sys.stdin.readline())
 
+	print("Actual number of ones:", np.sum((np.array(stream) == 1)[stream_size - k:]))	
+	print(bucket_list)
+	print("Estimated number:", estimate(bucket_list, k, timestamp))
