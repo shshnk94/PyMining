@@ -37,12 +37,16 @@ def motvani(bit, bucket_list, timestamp):
 	
 	return
 		
-def estimate(bucket_list, k, timestamp):
+def estimate(bucket_list, k, timestamp, window_size):
 
 	ones = 0
 	index = len(bucket_list) - 1
-	
-	while (index >= 0) and (k >= (timestamp - bucket_list[index][0])):
+
+	while (index >= 0) and ((timestamp - k + 1) >= bucket_list[index][0]):
+		ones += bucket_list[index][1]
+		index -= 1
+
+	while (index >= 0) and ((timestamp - k + 1) < bucket_list[index][0]):
 		ones += bucket_list[index][1]
 		index -= 1
 
@@ -57,9 +61,6 @@ if __name__ == "__main__":
 	stream_size = int(sys.stdin.readline())
 	
 	stream = []
-	#stream = list("1001010110001011010101010101011010101010101110101010111010100010110010")
-	#stream = list("11010100010110010111")
-
 	timestamp = 0
 	bucket_list = []
 
@@ -76,5 +77,4 @@ if __name__ == "__main__":
 	k = int(sys.stdin.readline())
 
 	print("Actual number of ones:", np.sum((np.array(stream) == 1)[stream_size - k:]))	
-	print(bucket_list)
-	print("Estimated number:", estimate(bucket_list, k, timestamp))
+	print("Estimated number:", estimate(bucket_list, k, timestamp, window_size))
