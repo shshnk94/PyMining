@@ -3,11 +3,17 @@ import sys
 import pdb
 
 def merge_buckets(bucket_list):
-	
+	"""
+	Merges buckets when there are more than 2 buckets of the same size. This is done recursively until no further
+	merging is required.
+	"""
+
 	flag = True
 	index = len(bucket_list) - 1
 
 	while flag and (index != 1):
+		
+		#Check if there are 3 buckets of same size and merge the least recent two into a single bucket, adding the sizes of each.
 		if bucket_list[index][1] == bucket_list[index - 1][1] == bucket_list[index - 2][1]:
 			bucket_list[index - 1][1] += bucket_list[index - 2][1]
 			bucket_list.pop(index - 2)
@@ -19,6 +25,9 @@ def merge_buckets(bucket_list):
 	return
 
 def motvani(bit, bucket_list, timestamp):
+	"""
+	Major code of Datar-Gionis-Indyk-Motwani algorithm.
+	"""
 
 	#Create the first bucket in the stream with size 1
 	if not bucket_list:
@@ -30,7 +39,8 @@ def motvani(bit, bucket_list, timestamp):
 		#Removes the least recent bucket, if timestamp (of course, mod window_size) is equal to the bucket's timestamp
 		if timestamp == bucket_list[0][0]:
 			bucket_list.pop(0)
-
+		
+		#When a 1 is observed we add a new bucket of size 1 and merge buckets recursively if required.
 		if bit == 1:
 			bucket_list.append([timestamp, 1])
 			merge_buckets(bucket_list)
