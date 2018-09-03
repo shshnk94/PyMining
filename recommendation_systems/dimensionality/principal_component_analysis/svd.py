@@ -45,9 +45,13 @@ if __name__ == "__main__":
 	with open("matrix", "r") as handle:
 		matrix = np.array([line.split() for line in handle], dtype = float)
 
-	symmetric_matrix = np.matmul(matrix.transpose(), matrix)
+	#matrix A is equal to (M.transpose() * M)
+	A = np.matmul(matrix.transpose(), matrix)
+	eigen_values, V = eigenpairs(A.copy())
 
-	eigen_values, eigen_matrix = eigenpairs(symmetric_matrix.copy())
-	transformed_matrix = np.matmul(matrix, eigen_matrix)
+	#matrix B is equal to (M * M.transpose())
+	B = np.matmul(matrix, matrix.transpose())
+	eigen_values, U = eigenpairs(B.copy())
 
-	print(transformed_matrix)
+	print(U)
+	print(V)
